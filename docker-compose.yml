@@ -3,11 +3,46 @@ services:
         image: existdb/existdb:6.3.0
         container_name: existdb
         volumes:
-            - existdb-data:/exist/data
+            - datamining-ex:/exist/data
         ports:
             - "8080:8080"
             - "8443:8443"
 
+    postgres:
+        image: postgres:14.15-alpine3.21
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: password
+        volumes:
+            - datamining-pg:/var/lib/postgresql/data 
+        ports:
+            - "5432:5432"
+
+    mongo:
+        container_name: mongo
+        image: mongo:8.0-rc
+        ports:
+            - "27017:27017"
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: password
+        volumes:
+            - datamining-mg:/data/db
+    
+    mongo-express:
+        image: mongo-express
+        ports:
+            - 8084:8081
+        environment:
+            ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            ME_CONFIG_MONGODB_ADMINPASSWORD: password
+            ME_CONFIG_MONGODB_URL: mongodb://root:password@mongo:27017/
+            ME_CONFIG_BASICAUTH: false
+
+    
+
 
 volumes:
-    existdb-data:
+    datamining-ex:
+    datamining-pg:
+    datamining-mg:
