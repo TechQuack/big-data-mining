@@ -1,0 +1,13 @@
+services:
+    existdb:
+        image: existdb/existdb:6.3.0
+        container_name: existdb
+        volumes:
+            - existdb-data:/exist/data
+        ports:
+            - "8080:8080"
+            - "8443:8443"
+
+
+volumes:
+    existdb-data:
