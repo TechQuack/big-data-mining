@@ -1,45 +1,24 @@
 xquery version "3.1";
 
-declare function local:http-download($file-url as xs:string, $collection as xs:string) as item()* {
-    let $request := <http:request href="{$file-url}" method="GET"/>
-    let $response := http:send-request($request)
-    let $head := $response[1]
-    
-    return
-        if ($head/@status = '200') then
-            let $filename := 
-                if (contains($head/http:header[@name='content-disposition']/@value, 'filename=')) then 
-                    $head/http:header[@name='content-disposition']/@value/substring-after(., 'filename=')
-                else 
-                    replace($file-url, '^.*/([^/]*)$', '$1')
-            let $media-type := $head/http:body/@media-type
-            let $mime-type := 
-                if (ends-with($file-url, '.xml') and $media-type = 'text/plain') then
-                    'application/xml'
-                else 
-                    $media-type
-            let $content-transfer-encoding := $head/http:body[@name = 'content-transfer-encoding']/@value
-            let $body := $response[2]
-            let $file := 
-                if (ends-with($file-url, '.xml') and $content-transfer-encoding = 'binary') then 
-                    convert:binary-to-string($body) 
-                else
-                    $body
-            let $result := 
-                if (ends-with($file-url, '.zip') or ends-with($file-url, '.gz')) then 
-                    archive:extract-to($collection, $body)
-                else
-                    db:put($collection, $file, $filename)
-            return
-                $result
+declare %updating function local:http-download($file-url as xs:string, $collection as xs:string) {
+    let $binary := fetch:binary($file-url)
+    let $filename := replace(replace($file-url, '.*/', ''), '\.[a-z, A-Z, 0-9]+$', '')
+    let $file := 
+        if (ends-with($file-url, '.xml')) then 
+            convert:binary-to-string($binary) 
         else
-            <error>
-                <message>Oops, something went wrong:</message>
-                {$head}
-            </error>
+            $binary
+    return
+        if (ends-with($file-url, '.zip')) then 
+            (archive:extract-to('data/bioc/', $file), db:add($collection, 'data/bioc'))
+        else if ( ends-with($file-url, '.gz')) then 
+            db:put($collection, archive:extract-binary($file), $filename)
+        else
+            db:put($collection, $file, $filename)
+    
 };
 
 let $url := 'https://ftp.ncbi.nlm.nih.gov/pub/lu/NLM-Chem-BC7-corpus/NLMChem-BC7-indexing.BioC.xml.gz'
-let $collection := '/db/bioc'
+let $collection := 'BIOC'
 return 
     local:http-download($url, $collection)
