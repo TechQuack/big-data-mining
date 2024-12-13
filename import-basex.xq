@@ -18,7 +18,7 @@ declare %updating function local:http-download($file-url as xs:string, $collecti
     
 };
 
-let $url := 'https://ftp.ncbi.nlm.nih.gov/pub/lu/NLM-Chem-BC7-corpus/NLMChem-BC7-indexing.BioC.xml.gz'
+let $url := 'https://ftp.ncbi.nlm.nih.gov/pub/lu/LitCovid/litcovid2pubtator.xml.gz'
 let $collection := 'BIOC'
 return 
     local:http-download($url, $collection)
