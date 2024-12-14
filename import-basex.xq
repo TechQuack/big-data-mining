@@ -10,9 +10,9 @@ declare %updating function local:http-download($file-url as xs:string, $collecti
             $binary
     return
         if (ends-with($file-url, '.zip')) then 
-            (archive:extract-to('data/bioc/', $file), db:add($collection, 'data/bioc'))
+            (archive:extract-to('data/export/bioc/', $file), db:add($collection, 'data/export/bioc'))
         else if ( ends-with($file-url, '.gz')) then 
-            db:put($collection, archive:extract-binary($file), $filename)
+            (archive:extract-to('data/export/bioc/import.xml', $file), db:add($collection, 'data/export/bioc/import.xml'))
         else
             db:put($collection, $file, $filename)
     
