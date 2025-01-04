@@ -27,8 +27,15 @@ services:
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: password
+        deploy:
+          resources:
+            limits:
+              memory: 12000M
+            reservations:
+              memory: 12000M
         volumes:
             - datamining-mg:/data/db
+            - ./LitCovid2:/import
     
     mongo-express:
         image: mongo-express
