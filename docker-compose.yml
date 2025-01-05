@@ -21,18 +21,12 @@ services:
 
     mongo:
         container_name: mongo
-        image: mongo:8.0-rc
+        image: mongo:8.0.4
         ports:
             - "27017:27017"
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: password
-        deploy:
-          resources:
-            limits:
-              memory: 12000M
-            reservations:
-              memory: 12000M
         volumes:
             - datamining-mg:/data/db
             - ./LitCovid2:/import
