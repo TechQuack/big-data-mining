@@ -1,10 +1,12 @@
 CALL apoc.periodic.iterate(
-"CALL apoc.load.jsonArray(\"file://litcovid2BioCJSON.json\") YIELD value as document",
+"CALL apoc.load.json(\"file://litcovid2BioCJSON.json\") YIELD value as documents
+UNWIND documents AS document
+RETURN document",
 "MERGE (doc:Document {_id: document._id}) ON CREATE
-    SET id = document.id, pmid = document.pmid, pmcid = document.pmcid, journal = document.journal, year = document.year
+    SET doc.id = document.id, doc.pmid = document.pmid, doc.pmcid = document.pmcid, doc.journal = document.journal, doc.year = document.year
 FOREACH (passage IN document.passages | 
-    CREATE (document)-[:REFERENCES]->(pas:Passage {offset: passage.offset, text: passage.text})
+    CREATE (doc)-[:REFERENCES]->(pas:Passage {offset: passage.offset, text: passage.text})
     CREATE (pas)-[:INFONS]->(data:Infons {section: passage.infons.section, type: passage.infons.type})
 )",
-{batchSize: 1000, parallel: true}
+{batchSize: 1, parallel: true}
 )
