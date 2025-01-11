@@ -26,3 +26,7 @@ Pour importer les données dans MongoDB, il est nécessaire d'exécuter la comma
 ```
 mongoimport --db big-data-mining --collection BIOC --file /import/litcovid2BioCJSON.json --username root --password password --authenticationDatabase admin --jsonArray
 ```
+
+### Utilisation de Neo4J
+
+Une fois les données importées dans Neo4J, il est possible d'utiliser le script treatment.cypher. Celui-ci affichera dans la console l'ensemble des résultats lignes par ligne. Il est ensuite possible de l'exporter au format CSV. Une fois le fichier CSV obtenu, un script est disponible pour le transformer au fichier TXT, clean.sh. Celui-ci se chargera d'enlever les " au début et à la fin de chaque ligne. Une fois le script exécuté, il n'y a plus qu'à enlever la première ligne du fichier (le header) pour obtenir le fichier txt final.
