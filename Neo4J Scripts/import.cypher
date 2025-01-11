@@ -6,7 +6,7 @@ RETURN document",
     SET doc.id = document.id, doc.pmid = document.pmid, doc.pmcid = document.pmcid, doc.journal = document.journal, doc.year = document.year
 FOREACH (passage IN document.passages | 
     CREATE (doc)-[:REFERENCES]->(pas:Passage {offset: passage.offset, text: passage.text})
-    CREATE (pas)-[:INFONS]->(data:Infons {section: passage.infons.section, type: passage.infons.type, section_type: passage.infons.section_type})
+    CREATE (pas)-[:INFONS]->(data:Infons {section: passage.infons.section, type: passage.infons.type, section_type: passage.infons.section_type, article_pmid: passage.infons.`article-id_pmid`})
 )",
 {batchSize: 1, parallel: true}
 )
