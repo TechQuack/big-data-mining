@@ -14,9 +14,9 @@ echo "Nombre complet d'instances de MESH: " `wc -l result`
 echo "Récupération du nombre d'instances par MESH, triées par ordre décroissant"
 awk -F' ' '{print $2}' result_final | sort | uniq -c | sort -nr > mesh_count
 
-echo "Suppression des MESH ayant un support inférieur à 0.2%"
+echo "Suppression des MESH ayant un support inférieur à 0.1%"
 total_instances=$(wc -l < result_final)
-awk -F' ' '{print $2}' result_final | sort | uniq -c | sort -nr | awk -v total="$total_instances" '$1>0.002*total {print $2}' > mesh_01
+awk -F' ' '{print $2}' result_final | sort | uniq -c | sort -nr | awk -v total="$total_instances" '$1>0.001*total {print $2}' > mesh_01
 
 echo "Nombre de MESH gardés : " `wc -l mesh_01`
 
