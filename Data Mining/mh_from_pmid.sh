@@ -21,12 +21,16 @@ for i in {1..1274}; do
     /<PMID Version="1">[0-9]+<\/PMID>/ {
         pmid=gensub(/.*<PMID Version="1">([0-9]+)<\/PMID>.*/,"\\1","g",$0)
         mesh=$0
-        sub(/.*<MeshHeadingList>/,"",mesh)
-        sub(/<\/MeshHeadingList>.*/,"",mesh)
-        mesh=gensub(/<MeshHeading>|<\/MeshHeading>/,"","g",mesh)
-        mesh=gensub(/<DescriptorName[^>]*>([^<]+)<\/DescriptorName>/,"\"\\1\"","g",mesh)
-        mesh=gensub(/<QualifierName[^>]*>[^<]*<\/QualifierName>/,"","g",mesh)
-        gsub(/\s+/," ",mesh)
+        if (index(mesh,"<MeshHeadingList>")==0) {
+            mesh=""
+        } else {
+            sub(/.*<MeshHeadingList>/,"",mesh)
+            sub(/<\/MeshHeadingList>.*/,"",mesh)
+            mesh=gensub(/<MeshHeading>|<\/MeshHeading>/,"","g",mesh)
+            mesh=gensub(/<DescriptorName[^>]*>([^<]+)<\/DescriptorName>/,"\"\\1\"","g",mesh)
+            mesh=gensub(/<QualifierName[^>]*>[^<]*<\/QualifierName>/,"","g",mesh)
+            gsub(/\s+/," ",mesh)
+        }
         if (pmid && mesh) print pmid" "mesh
     }
     ' pubmed25n$number.xml >> pmid_mh_ftp
