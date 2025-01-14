@@ -8,7 +8,7 @@ DECLARE
     passage_text text;
     result text := '';
 BEGIN
-    SELECT (json_content->>'pmid')::integer
+    SELECT json_content->'passages'->0->'infons'->>'article-id_pmid'
     INTO article_id;
 
     SELECT json_content->'passages'->0->'text'
