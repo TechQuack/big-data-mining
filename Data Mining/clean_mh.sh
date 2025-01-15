@@ -75,9 +75,9 @@ awk '
 }' pmid_005 > pmid_mh_ftp_support_005_sorted
 
 echo "Création du fichier final CSV ayant pour entête PMID,MH1,MH2,... (en utilisant les MH de mh_support_005). Un 1 dans la colonne signifie que le PMID possède le MH correspondant."
-echo -n "PMID" > pmid_mh_ftp_support_005.csv
-awk '{printf ",\"%s\"", $1}' mh_support_005_sorted >> pmid_mh_ftp_support_005.csv
-echo "" >> pmid_mh_ftp_support_005.csv
+echo -n "PMID" > pmid_mh_ftp_support_005_tab.csv
+awk '{printf "\t\"%s\"", $0}' mh_support_005_sorted >> pmid_mh_ftp_support_005_tab.csv
+echo "" >> pmid_mh_ftp_support_005_tab.csv
 awk 'NR==FNR{mh[NR]=$1;next} {
     match($0, /[0-9]+ /);
     pmid = substr($0, RSTART, RLENGTH - 1);
@@ -91,7 +91,7 @@ awk 'NR==FNR{mh[NR]=$1;next} {
     }
     for(mesh in mh) {
         if (current_field == mh[mesh]) {
-            printf ",1";
+            printf "\t1";
             if (match(rest, /"[^"]+"/)) {
                 current_field=substr(rest, RSTART + 1, RLENGTH - 2);
                 rest = substr(rest, RSTART + RLENGTH + 1)
@@ -99,8 +99,11 @@ awk 'NR==FNR{mh[NR]=$1;next} {
                 current_field=""
             }
         } else {
-            printf ",?"
+            printf "\t?"
         }
     };
     print ""
-}' mh_support_005_sorted pmid_mh_ftp_support_005_sorted >> pmid_mh_ftp_support_005.csv
+}' mh_support_005_sorted pmid_mh_ftp_support_005_sorted >> pmid_mh_ftp_support_005_tab.csv
+
+echo "Utilisation de JClose pour extraire les règles d'association"
+java -jar JClose_1.0.jar pmid_mh_ftp_support_005_tab.csv -s=0.00001 -c=0.8 -g -i -t
