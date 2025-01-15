@@ -37,3 +37,6 @@ for i in {1..1274}; do
 
     rm pubmed25n$number.xml
 done
+
+echo "Suppression des lignes ne contenant pas un PMID de LitCovid"
+awk -F' ' 'NR==FNR{a[$1];next} $1 in a' pmid_list.txt pmid_mh_ftp > pmid_litcovid_mh_ftp

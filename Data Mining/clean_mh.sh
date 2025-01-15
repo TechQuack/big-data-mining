@@ -8,7 +8,7 @@ awk '{
     print mh_name
     rest = substr(rest, RSTART + RLENGTH + 1)
   }
-}' pmid_mh_ftp | pv > pmid_mh
+}' pmid_litcovid_mh_ftp | pv > pmid_mh
 
 echo "Récupération des noms des MH"
 cat pmid_mh | sort -u > mh
@@ -48,7 +48,7 @@ awk 'NR==FNR{a[$1];next}
         rest = substr(rest, RSTART + RLENGTH + 1)
     }
     print out
-}' mh_support_005 pmid_mh_ftp > pmid_mh_ftp_support_005
+}' mh_support_005 pmid_litcovid_mh_ftp > pmid_mh_ftp_support_005
 
 echo "Suppression des PMID n'ayant plus de MH"
 awk -F' ' '{if (NF > 1) print $0}' pmid_mh_ftp_support_005 > pmid_005
@@ -106,4 +106,4 @@ awk 'NR==FNR{mh[NR]=$1;next} {
 }' mh_support_005_sorted pmid_mh_ftp_support_005_sorted >> pmid_mh_ftp_support_005_tab.csv
 
 echo "Utilisation de JClose pour extraire les règles d'association"
-java -jar JClose_1.0.jar pmid_mh_ftp_support_005_tab.csv -s=0.00001 -c=0.8 -g -i -t
+java -jar JClose_1.0.jar pmid_mh_ftp_support_005_tab.csv -s=0.1 -c=0.7 -g -i -t
