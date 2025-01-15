@@ -5,7 +5,7 @@ echo "Regroupement des MESH par PMID"
 awk -F' ' '$1==last {printf " %s",$2; next} NR>1 {print "";} {last=$1; printf "%s",$0;} END{print "";}' bioconcepts2pubtatorcentral_cleaned > bioconcepts2pubtatorcentral_cleaned_grouped
 
 echo "Récupération des noms de MESH"
-awk -F' ' '{print $2}' bioconcepts2pubtatorcentral_cleaned_grouped | sort | uniq > mesh
+awk -F' ' '{print $2}' bioconcepts2pubtatorcentral_cleaned | sort -u > mesh
 
 echo "Nombre de MESH différents : " `wc -l mesh`
 
@@ -16,7 +16,7 @@ awk -F' ' '{print $2}' bioconcepts2pubtatorcentral_cleaned_grouped | sort | uniq
 
 echo "Suppression des MESH ayant un support inférieur à 0.1%"
 total_instances=$(wc -l < bioconcepts2pubtatorcentral_cleaned_grouped)
-awk -F' ' '{print $2}' bioconcepts2pubtatorcentral_cleaned_grouped | sort | uniq -c | sort -nr | awk -v total="$total_instances" '$1>0.001*total {print $2}' > mesh_support_01
+cat mesh_count | awk -v total="$total_instances" '$1>0.001*total {print $2}' > mesh_support_01
 
 echo "Nombre de MESH gardés : " `wc -l mesh_support_01`
 
