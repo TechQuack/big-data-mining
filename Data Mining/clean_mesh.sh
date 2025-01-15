@@ -37,3 +37,31 @@ echo -n "PMID" > bioconcepts2pubtatorcentral_cleaned.csv
 awk -F' ' '{printf ",%s", $1}' mesh_support_01_sorted >> bioconcepts2pubtatorcentral_cleaned.csv
 echo "" >> bioconcepts2pubtatorcentral_cleaned.csv
 awk -F' ' 'NR==FNR{meshs[NR]=$1;next} {printf "%s", $1;current_field=2; for(mesh in meshs) {if ($current_field == meshs[mesh]) {printf ",1"; current_field=current_field + 1} else {printf ",?"}};print ""}' mesh_support_01_sorted bioconcepts2pubtatorcentral_cleaned_grouped_support_sorted >> bioconcepts2pubtatorcentral_cleaned.csv
+
+echo "Transformation des ID des MESH en noms dans les règles d'associations"
+
+# Function to get MESH name from ID
+get_mesh_name() {
+    local mesh_id=$1
+    local url="https://meshb.nlm.nih.gov/record/ui?ui=${mesh_id}"
+    curl -s "$url" | grep -oP '(?<=<h1>).*(?=</h1>)' | sed 's/<small>.*<\/small>//g'
+}
+
+# Read the association rules file and replace MESH IDs with names
+input_file="bioconcepts2pubtatorcentral_cleaned_ms=0.006_mc=0.7.mma.nom"
+output_file="association_rules_with_names.txt"
+
+echo "" > "$output_file"
+
+while IFS= read -r line; do
+    if [[ $line =~ ^\[.*\] ]]; then
+        ids=$(echo "$line" | grep -oP 'D[0-9]{6}')
+        for id in $ids; do
+            name=$(get_mesh_name "$id")
+            line=${line//$id/$name}
+        done
+    fi
+    echo "$line" >> "$output_file"
+done < "$input_file"
+
+echo "Transformation terminée. Les règles d'associations avec les noms des MESH sont dans $output_file"
